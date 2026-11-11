@@ -423,11 +423,14 @@ export const exportSnippet = async ({
     case "gerbers": {
       const zip = new JSZip()
 
-      const gerberFiles = convertCircuitJsonToGerberFiles(circuitJson, {
+      const filteredCircuitJson = circuitJson.filter(
+        (element) => !("error_type" in element) && !("warning_type" in element),
+      )
+      const gerberFiles = convertCircuitJsonToGerberFiles(filteredCircuitJson, {
         flip_y_axis: false,
       })
       for (const [fileName, fileContents] of Object.entries(gerberFiles)) {
-        zip.file(fileName, fileContents)
+        zip.file(`gerber/${fileName}`, fileContents)
       }
 
       const bomRows = await convertCircuitJsonToBomRows({ circuitJson })

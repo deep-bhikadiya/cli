@@ -73,27 +73,32 @@ test("gerber export includes every plated drill span and NPTH drill file", async
 
     expect(exitCode).toBe(0)
     const zip = await JSZip.loadAsync(fabricationZip!)
-    expect(Object.keys(zip.files)).toEqual(
+    const zipFileNames = Object.keys(zip.files)
+    expect(zipFileNames).toEqual(
       expect.arrayContaining([
-        "F_Cu.gbr",
-        "In1_Cu.gbr",
-        "In2_Cu.gbr",
-        "B_Cu.gbr",
-        "Edge_Cuts.gbr",
-        "drill-L1-L2.drl",
-        "drill-L1-L4.drl",
-        "drill_npth.drl",
+        "gerber/F_Cu.gbr",
+        "gerber/In1_Cu.gbr",
+        "gerber/In2_Cu.gbr",
+        "gerber/B_Cu.gbr",
+        "gerber/Edge_Cuts.gbr",
+        "gerber/drill-L1-L2.drl",
+        "gerber/drill-L1-L4.drl",
+        "gerber/drill_npth.drl",
         "bom.csv",
         "pick_and_place.csv",
       ]),
     )
-    expect(await zip.file("drill-L1-L2.drl")!.async("string")).toContain(
+    expect(zipFileNames.filter((fileName) => !fileName.includes("/"))).toEqual([
+      "bom.csv",
+      "pick_and_place.csv",
+    ])
+    expect(await zip.file("gerber/drill-L1-L2.drl")!.async("string")).toContain(
       "X-4.0000Y0.0000",
     )
-    expect(await zip.file("drill-L1-L4.drl")!.async("string")).toContain(
+    expect(await zip.file("gerber/drill-L1-L4.drl")!.async("string")).toContain(
       "X4.0000Y0.0000",
     )
-    expect(await zip.file("drill_npth.drl")!.async("string")).toContain(
+    expect(await zip.file("gerber/drill_npth.drl")!.async("string")).toContain(
       "X0.0000Y4.0000",
     )
   } finally {
